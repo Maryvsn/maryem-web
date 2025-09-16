@@ -32,8 +32,7 @@ const Hero = () => {
                 <span className="gradient-text">Maryem Rabie</span>
               </h1>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-muted-foreground mb-6 animate-fade-in stagger-3">
-                Aspiring Data Analyst & <br />
-                Machine Learning Enthusiast
+                Machine Learning Engineer
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl animate-fade-in stagger-4">
                 Transforming raw data into meaningful insights and building solutions 
