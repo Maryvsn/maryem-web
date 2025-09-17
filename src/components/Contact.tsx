@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import emailjs from '@emailjs/browser';
 import { 
   Mail, 
   Phone, 
   Linkedin,
   Send,
-  MapPin
+  MapPin,
+  Loader2
 } from "lucide-react";
 
 const Contact = () => {
@@ -19,7 +21,11 @@ const Contact = () => {
     subject: "",
     message: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Initialize EmailJS
+  emailjs.init("eIi8OMqzVTLJiXQbg");
 
   const contactInfo = [
     {
@@ -53,21 +59,45 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to a backend service
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. I'll get back to you soon!",
-    });
-    
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: ""
-    });
+    setIsLoading(true);
+
+    try {
+      // Send email using EmailJS
+      await emailjs.send(
+        "service_lffhrhn", // Service ID
+        "template_id8d1ju", // Template ID
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }
+      );
+
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for reaching out. I'll get back to you soon!",
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+      });
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      toast({
+        title: "Failed to Send",
+        description: "There was an error sending your message. Please try again or contact me directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -218,10 +248,20 @@ const Contact = () => {
                   <Button 
                     type="submit"
                     size="lg"
-                    className="w-full bg-gradient-primary hover:scale-105 transition-all duration-300 group"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-primary hover:scale-105 transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    <Send className="mr-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    Send Message
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        Send Message
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>
